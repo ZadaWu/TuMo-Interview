@@ -146,16 +146,18 @@ CREATE TABLE payment_transactions (
    5.1 第一次捕获
 ![alt text](image-4.png)
 ![alt text](image-5.png)
-   5.2 第二次捕获 (由于捕获金额等于总额，因此order状态更新为PAID)
+   5.2 第二次捕获 (由于捕获金额等于总额，因此order状态流转为PAID)
 ![alt text](image-7.png)
 ![alt text](image-8.png)
 ![alt text](image-9.png)
-## 6. 支付失败
+## 6. 支付失败 （order状态流转为FAILED）
 ![alt text](image-10.png)
 ![alt text](image-11.png)
-## 7. 退款
+## 7. 退款 （order状态流转为REFUNDED）
 ![alt text](image-12.png)
 ![alt text](image-13.png)
+
+
 ## 贡献
 
 欢迎提出问题和贡献代码！
