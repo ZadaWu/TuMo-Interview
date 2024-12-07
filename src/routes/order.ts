@@ -7,7 +7,6 @@ const orderController = new OrderController();
 
 // Create order
 router.post('/', auth, async (req: Request, res: Response) => {
-    console.log(10, req.userId);
     await orderController.createOrder(req, res);
 });
 

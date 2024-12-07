@@ -31,7 +31,6 @@ export class Order extends Model {
         try {
             // 开始事务
             await mysql.query('START TRANSACTION');
-            console.log(34, orderData);
             
             // 修复这里的解构赋值
             const result = await mysql.query<any>(

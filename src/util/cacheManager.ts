@@ -6,7 +6,26 @@ export class CacheManager {
     private readonly DEFAULT_EXPIRATION = 3600; // 1 hour in seconds
 
     constructor() {
-        this.memcached = new Memcached('localhost:11211');
+        // Try to connect with retries and error handling
+        const servers = process.env.MEMCACHED_SERVERS || 'localhost:11211';
+        const options = {
+            retries: 3,
+            retry: 3000,
+            timeout: 5000,
+            reconnect: 10000,
+            failures: 3
+        };
+        
+        this.memcached = new Memcached(servers, options);
+        
+        // Add error handler
+        this.memcached.on('failure', function(details) {
+            console.error('Memcached connection failed:', details);
+        });
+        
+        this.memcached.on('reconnecting', function(details) {
+            console.log('Memcached reconnecting:', details);
+        });
     }
 
     async get(key: string): Promise<any> {
