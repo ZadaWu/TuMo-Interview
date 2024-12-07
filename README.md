@@ -140,7 +140,9 @@ CREATE TABLE payment_transactions (
 ![alt text](image-2.png)
 3. 支付授权(避免相同支付回调通知)
 ![alt text](image-3.png)
-
+4. 支付捕获
+![alt text](image-4.png)
+![alt text](image-5.png)
 
 ## 贡献
 

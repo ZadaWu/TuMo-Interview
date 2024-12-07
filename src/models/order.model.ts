@@ -90,7 +90,6 @@ export class Order extends Model {
                 [orderId]
             );
 
-            console.log(93, orders, orderId);
 
             if (!orders || orders.length === 0) {
                 throw new Error('Order not found');

@@ -146,7 +146,6 @@ export class PaymentCallbackService {
     private async isDuplicateNotification(transactionId: string): Promise<boolean> {
         const key = `payment:notification:${transactionId}`;
         const existingValue = await cacheManager.get(key);
-        console.log(155, 'existingValue', existingValue);
         if (existingValue) {
             return true; // Duplicate notification
         }

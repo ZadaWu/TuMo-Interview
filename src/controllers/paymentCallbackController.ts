@@ -19,9 +19,9 @@ export class PaymentCallbackController {
             }
 
             // 2. 检查是否重复通知
-            const isDuplicate = await this.paymentCallbackService.isDuplicateNotification(req.body.transactionId);
+            const isDuplicate = await this.paymentCallbackService.isDuplicateNotification(req.body.transactionId + req.body.status );
             if (isDuplicate) {
-                console.log('Duplicate notification received', { transactionId: req.body.transactionId });
+                console.log('Duplicate notification received', { transactionId: req.body.transactionId + req.body.status });
                 return res.status(200).send('success'); // 重复通知也返回成功
             }
 
