@@ -1,5 +1,5 @@
 import { Order } from '../models/order.model';
-import { redis } from '../config/redis';
+import cacheManager from '../util/cacheManager';
 
 export class OrderService {
     // 创建订单
@@ -55,12 +55,11 @@ export class OrderService {
     // 缓存相关的私有方法
     private async cacheOrder(order: any) {
         const key = `order:${order.id}`;
-        await redis.setex(key, 3600, JSON.stringify(order));
+        await cacheManager.set(key, order);
     }
 
     private async getCachedOrder(orderId: number) {
         const key = `order:${orderId}`;
-        const data = await redis.get(key);
-        return data ? JSON.parse(data) : null;
+        return await cacheManager.get(key);
     }
-} 
+}
