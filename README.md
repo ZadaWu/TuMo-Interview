@@ -98,17 +98,48 @@ CREATE TABLE order_status_history (
     INDEX idx_order_id (orderId)
 );
 
+-- 创建支付授权表
+CREATE TABLE payment_transactions (
+    id SERIAL PRIMARY KEY,
+    order_id VARCHAR(255) NOT NULL,           -- 商户订单号
+    transaction_id VARCHAR(255) NOT NULL,      -- 支付网关交易号
+    status VARCHAR(50) NOT NULL,              -- 支付状态：AUTHORIZED/CAPTURED/FAILED/REFUNDED/DISPUTED
+    amount DECIMAL(10,2),                     -- 交易金额
+    currency VARCHAR(3),                      -- 货币类型
+    
+    -- 卡信息
+    card_last4 VARCHAR(4),                    -- 卡号后四位
+    card_brand VARCHAR(50),                   -- 卡品牌
+    
+    -- 授权/支付信息
+    authorization_code VARCHAR(255),           -- 授权码
+    captured_amount DECIMAL(10,2),            -- 已捕获金额
+    captured_at TIMESTAMP,                    -- 捕获时间
+    
+    -- 失败信息
+    failure_reason TEXT,                      -- 失败原因
+    response_code VARCHAR(50),                -- 响应码
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    UNIQUE(transaction_id)
+);
 
 ## 技术实现
 1. 使用JWT来完成身份验证，
 2. 使用redis来完成和持久化
 3. 使用memcache和redis来完成多层缓存
+4. 使用redislock 与 order查询 来避免相同订单重复创建
 
 ## 功能点：
 1. 用户注册与登录
 ![alt text](image-1.png)
-2. 订单创建
+2. 订单创建(避免相同订单重复创建)
 ![alt text](image.png)
+![alt text](image-2.png)
+3. 支付授权(避免相同支付回调通知)
+![alt text](image-3.png)
 
 
 ## 贡献

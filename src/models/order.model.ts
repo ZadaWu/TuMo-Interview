@@ -90,11 +90,13 @@ export class Order extends Model {
                 [orderId]
             );
 
+            console.log(93, orders, orderId);
+
             if (!orders || orders.length === 0) {
                 throw new Error('Order not found');
             }
 
-            const oldStatus = orders[0].status;
+            const oldStatus = orders.status;
 
             // 更新订单状态
             await mysql.query(
@@ -104,8 +106,8 @@ export class Order extends Model {
 
             // 记录状态变更历史
             await mysql.query(
-                'INSERT INTO order_status_history (orderId, fromStatus, toStatus, changedBy) VALUES (?, ?, ?, ?)',
-                [orderId, oldStatus, status, userId]
+                'INSERT INTO order_status_history (orderId, fromStatus, toStatus, changedBy ) VALUES (?, ?, ?, ?)',
+                [orderId, oldStatus, status, 'transcation']
             );
 
             // 提交事务

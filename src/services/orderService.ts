@@ -1,4 +1,4 @@
-import { Order } from '../models/order.model';
+import { Order, OrderStatus } from '../models/order.model';
 import cacheManager from '../util/cacheManager';
 import { redisLock } from '../config/redis';
 import { Op } from 'sequelize';
@@ -47,7 +47,7 @@ export class OrderService {
     async updateOrderStatus(orderId: number, status: string, userId: number) {
         try {
             // 使用 Model 层方法更新状态
-            const order = await Order.updateOrderStatus(orderId, status, userId);
+            const order = await Order.updateOrderStatus(orderId, status as OrderStatus, userId);
             
             // 更新缓存
             await this.cacheOrder(order);

@@ -10,6 +10,7 @@ import express from 'express';
 import usersRouter from './routes/users';
 import dotenv from 'dotenv';
 import orderRouter from './routes/order';
+import paymentRouter from './routes/payment';
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ app.use(express.json());
 // 路由
 app.use('/users', usersRouter);
 app.use('/orders', orderRouter);
-
+app.use('/payment', paymentRouter);
 
 const PORT = process.env.PORT || 3000;
 
