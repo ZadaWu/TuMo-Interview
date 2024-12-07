@@ -3,6 +3,7 @@ import { OrderService } from './orderService';
 import { Payment } from '../models/payment.model';
 import cacheManager from '../util/cacheManager';
 import sequelize from '../util/sequelize';
+import { OrderStatus } from '../models/order.model';  
 
 interface PaymentNotification {
     merchantOrderId: string;     // 商户订单号
@@ -129,7 +130,7 @@ export class PaymentCallbackService {
         });
 
         // 2. 更新订单状态
-        await this.orderService.updateOrderStatus(merchantOrderId, 'PAYMENT_FAILED');
+        await this.orderService.updateOrderStatus(merchantOrderId, 'FAILED');
 
         // 3. 发送失败通知
         // await this.notificationService.sendPaymentFailureNotification(
@@ -156,6 +157,32 @@ export class PaymentCallbackService {
         //     orderId: merchantOrderId,
         //     transactionId
         // });
+    }
+
+    private async handleRefund(notification: PaymentNotification) {
+        const { merchantOrderId, transactionId, amount } = notification;
+
+        // 1. 更新支付记录
+        await this.Payment.updatePayment(transactionId, {
+            orderId: merchantOrderId,
+            status: 'REFUNDED',
+            capturedAmount: -amount,  // 负数表示退款
+            capturedAt: new Date()
+        });
+
+        // 2. 更新订单状态
+        await this.orderService.updateOrderStatus(merchantOrderId, OrderStatus.REFUNDED);
+
+        // 3. TODO：记录退款历史
+        // await this.Payment.saveRefundRecord({
+        //     orderId: merchantOrderId,
+        //     transactionId,
+        //     amount,
+        //     refundedAt: new Date()
+        // });
+
+        // 4. 可选：发送退款通知
+        // await this.notificationService.sendRefundNotification(merchantOrderId);
     }
 
     private verifyNotification(notification: PaymentNotification): boolean {

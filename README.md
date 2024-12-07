@@ -59,7 +59,6 @@ CREATE TABLE orders (
     INDEX idx_user_id (userId),
     INDEX idx_order_number (orderNumber)
 );
-
 ALTER TABLE orders MODIFY COLUMN status ENUM(
     'PENDING',           -- 待支付
     'PAID',             -- 已支付
@@ -70,7 +69,8 @@ ALTER TABLE orders MODIFY COLUMN status ENUM(
     'CANCELLED',        -- 已取消
     'REFUND_PENDING',   -- 退款申请中
     'REFUNDED',         -- 已退款
-    'CLOSED'            -- 已关闭
+    'CLOSED',           -- 已关闭
+    'FAILED'            -- 支付失败
 ) NOT NULL DEFAULT 'PENDING';
 
 -- 创建订单项表
@@ -150,6 +150,12 @@ CREATE TABLE payment_transactions (
 ![alt text](image-7.png)
 ![alt text](image-8.png)
 ![alt text](image-9.png)
+## 6. 支付失败
+![alt text](image-10.png)
+![alt text](image-11.png)
+## 7. 退款
+![alt text](image-12.png)
+![alt text](image-13.png)
 ## 贡献
 
 欢迎提出问题和贡献代码！

@@ -23,11 +23,19 @@ interface FailureRecord {
     failedAt: Date;
 }
 
+interface RefundRecord {
+    orderId: string;
+    transactionId: string;
+    amount: number;
+    refundedAt: Date;
+}
+
 export class Payment {
     private static KEYS = {
         AUTHORIZATION: (transactionId: string) => `payment:auth:${transactionId}`,
         PAYMENT: (transactionId: string) => `payment:${transactionId}`,
-        FAILURE: (orderId: string) => `payment:failure:${orderId}`
+        FAILURE: (orderId: string) => `payment:failure:${orderId}`,
+        REFUND: (orderId: string) => `payment:refund:${orderId}`
     };
 
     async saveAuthorization(data: AuthorizationData): Promise<void> {
@@ -129,6 +137,31 @@ export class Payment {
                 responseCode: data.responseCode,
                 failedAt: data.failedAt,
                 orderId: data.orderId
+            }
+        });
+    }
+
+    async saveRefundRecord(data: RefundRecord): Promise<void> {
+        const key = Payment.KEYS.REFUND(data.orderId);
+        await cacheManager.set(key, {
+            ...data,
+            refundedAt: data.refundedAt.toISOString()
+        }, 60 * 60 * 24 * 30); // 30天过期
+
+        // Update database
+        await sequelize.query(`
+            UPDATE payment_transactions 
+            SET 
+                status = 'REFUNDED',
+                captured_amount = captured_amount - :amount,
+                updated_at = :refundedAt
+            WHERE order_id = :orderId AND transaction_id = :transactionId
+        `, {
+            replacements: {
+                amount: data.amount,
+                refundedAt: data.refundedAt,
+                orderId: data.orderId,
+                transactionId: data.transactionId
             }
         });
     }

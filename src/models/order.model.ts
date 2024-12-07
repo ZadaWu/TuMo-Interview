@@ -13,7 +13,8 @@ export enum OrderStatus {
     CANCELLED = 'CANCELLED',       // 已取消
     REFUND_PENDING = 'REFUND_PENDING', // 退款申请中
     REFUNDED = 'REFUNDED',        // 已退款
-    CLOSED = 'CLOSED'             // 已关闭
+    CLOSED = 'CLOSED',             // 已关闭
+    FAILED = 'FAILED'             // 支付失败
 }
 
 export class Order extends Model {
