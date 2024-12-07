@@ -38,7 +38,7 @@ npm start
 ```
 
 ## 数据库
-
+-- 创建用户表
 CREATE TABLE IF NOT EXISTS user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
@@ -47,15 +47,69 @@ CREATE TABLE IF NOT EXISTS user (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 
-CREATE TABLE IF NOT EXISTS `order` (
+-- 创建订单表
+CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    order_number VARCHAR(50) NOT NULL UNIQUE,
+    userId INT NOT NULL,
+    orderNumber VARCHAR(255) NOT NULL UNIQUE,
+    status VARCHAR(50) NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
-    status VARCHAR(20) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id)
-)
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_user_id (userId),
+    INDEX idx_order_number (orderNumber)
+);
+
+ALTER TABLE orders MODIFY COLUMN status ENUM(
+    'PENDING',           -- 待支付
+    'PAID',             -- 已支付
+    'PROCESSING',       -- 处理中
+    'SHIPPED',          -- 已发货
+    'DELIVERED',        -- 已送达
+    'COMPLETED',        -- 已完成
+    'CANCELLED',        -- 已取消
+    'REFUND_PENDING',   -- 退款申请中
+    'REFUNDED',         -- 已退款
+    'CLOSED'            -- 已关闭
+) NOT NULL DEFAULT 'PENDING';
+
+-- 创建订单项表
+CREATE TABLE order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    orderId INT NOT NULL,
+    productId VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (orderId) REFERENCES orders(id),
+    INDEX idx_order_id (orderId)
+);
+
+-- 创建订单状态历史表
+CREATE TABLE order_status_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    orderId INT NOT NULL,
+    fromStatus VARCHAR(50) NOT NULL,
+    toStatus VARCHAR(50) NOT NULL,
+    changedBy INT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (orderId) REFERENCES orders(id),
+    INDEX idx_order_id (orderId)
+);
+
+
+## 技术实现
+1. 使用JWT来完成身份验证，
+2. 使用redis来完成和持久化
+3. 使用memcache和redis来完成多层缓存
+
+## 功能点：
+1. 用户注册与登录
+![alt text](image-1.png)
+2. 订单创建
+![alt text](image.png)
+
 
 ## 贡献
 
