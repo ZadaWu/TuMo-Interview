@@ -1,11 +1,31 @@
 import { Order } from '../models/order.model';
 import cacheManager from '../util/cacheManager';
+import { redisLock } from '../config/redis';
+import { Op } from 'sequelize';
 
 export class OrderService {
     // 创建订单
     async createOrder(userId: number, orderData: any) {
+        const minutes = 5;
+        const timestamp = Math.floor(Date.now() / (1000 * 60 * minutes)); // Get timestamp by minutes interval
+        const lockKey = `order:lock:${userId}:${timestamp}`;
+        
         try {
-            // 使用 Model 层方法创建订单
+            
+            // 尝试获取分布式锁
+            const acquired = await redisLock.acquireLock(lockKey);
+            
+            if (!acquired) {
+                throw new Error('Order is being processed, please try again later');
+            }
+
+            // 检查是否存在未完成的近期订单
+            const existingOrder = await Order.findRecentPendingOrder(userId, 5);
+            if (existingOrder) {
+                throw new Error('You have a pending order in the last 30 minutes, please try again later');
+            }
+
+            // 创建订单
             const order = await Order.createOrder({
                 userId,
                 ...orderData
@@ -17,6 +37,9 @@ export class OrderService {
             return order;
         } catch (error) {
             throw error;
+        } finally {
+            // 释放锁
+            await redisLock.releaseLock(lockKey);
         }
     }
 

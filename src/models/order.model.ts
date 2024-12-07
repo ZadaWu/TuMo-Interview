@@ -1,6 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import MySQLClient from '../util/getMysql';
 import sequelize from '../util/sequelize';
+import { Op } from 'sequelize';
 
 export enum OrderStatus {
     PENDING = 'PENDING',           // 待支付
@@ -126,6 +127,19 @@ export class Order extends Model {
 
     private static generateOrderNumber() {
         return `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
+    }
+
+    // 静态方法：查找用户的近期待处理订单
+    static async findRecentPendingOrder(userId: number, minutes: number = 30) {
+        return await this.findOne({
+            where: {
+                userId,
+                status: OrderStatus.PENDING,
+                createdAt: {
+                    [Op.gte]: new Date(Date.now() - minutes * 60 * 1000)
+                }
+            }
+        });
     }
 }
 
