@@ -2,6 +2,7 @@ import { redis } from '../config/redis';
 import { OrderService } from './orderService';
 import { Payment } from '../models/payment.model';
 import cacheManager from '../util/cacheManager';
+import sequelize from '../util/sequelize';
 
 interface PaymentNotification {
     merchantOrderId: string;     // 商户订单号
@@ -84,13 +85,32 @@ export class PaymentCallbackService {
 
         // 1. 更新支付记录
         await this.Payment.updatePayment(transactionId, {
+            orderId: merchantOrderId,
             status: 'CAPTURED',
             capturedAmount: amount,
             capturedAt: new Date()
         });
 
-        // 2. 更新订单状态
-        await this.orderService.updateOrderStatus(merchantOrderId, 'PAID');
+        // 2. 获取订单信息&&更新订单状态 
+        const order = await this.orderService.getOrderById(merchantOrderId);
+
+        // 3. 根据orderId获取所有捕获的金额
+        // Get all captured payments for this order
+        const [result] = await sequelize.query(`
+            SELECT SUM(captured_amount) as total_captured
+            FROM payment_transactions 
+            WHERE order_id = :orderId 
+            AND status = 'CAPTURED'`, {
+            replacements: {
+                orderId: merchantOrderId
+            }
+        });
+        
+        const totalCapturedAmount = result?.[0]?.total_captured || 0;
+ 
+        if (totalCapturedAmount >= order.totalAmount) {
+            await this.orderService.updateOrderStatus(merchantOrderId, 'PAID', 'transaction');
+        }
 
         // 3. 触发后续业务流程
         // await this.fulfillmentService.initiateFulfillment(merchantOrderId);

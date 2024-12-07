@@ -133,17 +133,23 @@ CREATE TABLE payment_transactions (
 4. 使用redislock 与 order查询 来避免相同订单重复创建
 
 ## 功能点：
-1. 用户注册与登录
+### 1. 用户注册与登录
 ![alt text](image-1.png)
-2. 订单创建(避免相同订单重复创建)
+### 2. 订单创建(避免相同订单重复创建)
 ![alt text](image.png)
 ![alt text](image-2.png)
-3. 支付授权(避免相同支付回调通知)
+### 3. 订单查询
+![alt text](image-6.png)
+### 4. 支付授权(避免相同支付回调通知)
 ![alt text](image-3.png)
-4. 支付捕获
+### 5. 支付捕获
+   5.1 第一次捕获
 ![alt text](image-4.png)
 ![alt text](image-5.png)
-
+   5.2 第二次捕获 (由于捕获金额等于总额，因此order状态更新为PAID)
+![alt text](image-7.png)
+![alt text](image-8.png)
+![alt text](image-9.png)
 ## 贡献
 
 欢迎提出问题和贡献代码！

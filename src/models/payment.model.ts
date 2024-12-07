@@ -10,6 +10,7 @@ interface AuthorizationData {
 }
 
 interface PaymentUpdateData {
+    orderId: string;
     status: string;
     capturedAmount: number;
     capturedAt: Date;
@@ -74,15 +75,29 @@ export class Payment {
 
         // Update database
         await sequelize.query(`
-            UPDATE payment_transactions 
-            SET 
-                status = :status,
-                captured_amount = :capturedAmount,
-                captured_at = :capturedAt,
-                updated_at = :updatedAt
-            WHERE transaction_id = :transactionId
+            INSERT INTO payment_transactions (
+                order_id,
+                transaction_id,
+                status,
+                captured_amount,
+                captured_at,
+                updated_at
+            ) VALUES (
+                :orderId,
+                :transactionId,
+                :status,
+                :capturedAmount, 
+                :capturedAt,
+                :updatedAt
+            )
+            ON DUPLICATE KEY UPDATE
+                status = VALUES(status),
+                captured_amount = VALUES(captured_amount),
+                captured_at = VALUES(captured_at),
+                updated_at = VALUES(updated_at)
         `, {
             replacements: {
+                orderId: data.orderId,
                 status: data.status,
                 capturedAmount: data.capturedAmount,
                 capturedAt: data.capturedAt,
