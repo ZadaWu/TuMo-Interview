@@ -39,6 +39,7 @@ npm start
 
 ## 数据库
 -- 创建用户表
+```
 CREATE TABLE IF NOT EXISTS user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
@@ -46,8 +47,11 @@ CREATE TABLE IF NOT EXISTS user (
     email VARCHAR(255) NOT NULL UNIQUE, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
+```
 
 -- 创建订单表
+
+```
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     userId INT NOT NULL,
@@ -72,8 +76,9 @@ ALTER TABLE orders MODIFY COLUMN status ENUM(
     'CLOSED',           -- 已关闭
     'FAILED'            -- 支付失败
 ) NOT NULL DEFAULT 'PENDING';
-
+```
 -- 创建订单项表
+```
 CREATE TABLE order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     orderId INT NOT NULL,
@@ -85,8 +90,10 @@ CREATE TABLE order_items (
     FOREIGN KEY (orderId) REFERENCES orders(id),
     INDEX idx_order_id (orderId)
 );
+```
 
 -- 创建订单状态历史表
+```
 CREATE TABLE order_status_history (
     id INT AUTO_INCREMENT PRIMARY KEY,
     orderId INT NOT NULL,
@@ -97,8 +104,10 @@ CREATE TABLE order_status_history (
     FOREIGN KEY (orderId) REFERENCES orders(id),
     INDEX idx_order_id (orderId)
 );
+```
 
 -- 创建支付授权表
+```
 CREATE TABLE payment_transactions (
     id SERIAL PRIMARY KEY,
     order_id VARCHAR(255) NOT NULL,           -- 商户订单号
@@ -125,6 +134,7 @@ CREATE TABLE payment_transactions (
     
     UNIQUE(transaction_id)
 );
+```
 
 ## 技术实现
 1. 使用JWT来完成身份验证，
