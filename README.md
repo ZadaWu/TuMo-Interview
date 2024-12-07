@@ -1,29 +1,24 @@
-# TuMo interview
+# my-express-app/my-express-app/README.md
 
-#  Node.js MySQL Typescript
+# My Express App
 
-这是一个使用Node.js、Express和MySQL构建的简单应用程序。该项目演示了如何创建一个RESTful API来处理用户相关的操作。
-我尝试的题目是选题二：游戏支付系统
+这是一个使用 Express 框架构建的 Node.js 应用程序示例。
 
 ## 项目结构
 
 ```
-TuMo interview
+my-express-app
 ├── src
-│   ├── app.js                # 应用程序入口点
-│   ├── config
-│   │   └── database.js       # 数据库配置
-│   ├── controllers
-│   │   └── userController.js  # 用户控制器
-│   ├── models
-│   │   └── userModel.js      # 用户模型
-│   ├── routes
-│   │   └── userRoutes.js     # 用户路由
-│   └── services
-│       └── userService.js    # 用户服务
-├── package.json               # npm配置文件
-├── .env                       # 环境变量配置
-└── README.md                  # 项目文档
+│   ├── app.js               # 应用程序入口点
+│   ├── controllers          # 控制器目录
+│   │   └── index.js         # 控制器实现
+│   ├── routes               # 路由目录
+│   │   └── index.js         # 路由设置
+│   └── models               # 模型目录
+│       └── index.js         # 数据模型实现
+├── package.json             # npm 配置文件
+├── .gitignore               # 版本控制忽略文件
+└── README.md                # 项目文档
 ```
 
 ## 安装依赖
@@ -34,17 +29,6 @@ TuMo interview
 npm install
 ```
 
-## 配置数据库
-
-在`.env`文件中配置您的数据库连接字符串，例如：
-
-```
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=yourpassword
-DB_NAME=yourdatabase
-```
-
 ## 启动应用
 
 使用以下命令启动应用程序：
@@ -53,17 +37,26 @@ DB_NAME=yourdatabase
 npm start
 ```
 
-应用程序将在 `http://localhost:3000` 上运行。
+## 数据库
 
-## API 端点
+CREATE TABLE IF NOT EXISTS user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
 
-- `GET /users` - 获取用户列表
-- `POST /users` - 创建新用户
+CREATE TABLE IF NOT EXISTS `order` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    order_number VARCHAR(50) NOT NULL UNIQUE,
+    amount DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user(id)
+)
 
 ## 贡献
 
-欢迎任何形式的贡献！请提交问题或拉取请求。
-
-## 许可证
-
-此项目使用MIT许可证。
+欢迎提出问题和贡献代码！
