@@ -168,6 +168,8 @@ CREATE TABLE payment_transactions (
 ![alt text](image-13.png)
 
 
+TODO：
+构建一个 API 网关，加入速率限制和 IP 黑名单功能。
 ## 贡献
 
 欢迎提出问题和贡献代码！
